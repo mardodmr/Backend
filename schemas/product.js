@@ -25,13 +25,13 @@ const Product = mongoose.model(
       type: String,
       required: function () {
         return this.isClothes;
-      },
+      }
     },
     color: {
       type: String,
       required: function () {
         return this.isClothes;
-      },
+      }
     },
     isClothes: Boolean,
     owner: {

@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const { User } = require("../schemas/product");
+const { User, Credential } = require("../schemas/user");
 const router = express.Router();
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
@@ -16,25 +16,45 @@ router.get("/me", auth, async (req, res) => {
   res.send(user);
 });
 
-//create user register
-router.post("/", async (req, res) => {
-  let user = await User.findOne({ email: req.params.email });
-  if (!user) return res.status(400).send("User already registered.");
+//create user (register)
+router.post("/credentials", async (req, res) => {
+  let userCredentials = await Credential.findOne({ email: req.body.email });
+  if (userCredentials) return res.status(400).send("User already registered.");
 
-  user = new User(_.pick(req.params, ["email", "password"]));
+  userCredentials = new Credential({
+    email: req.body.email,
+    password: req.body.password,
+  });
 
   const salt = await bcrypt.genSalt(10);
-  user.password = await bcrypt.hash(user.password, salt);
+  userCredentials.password = await bcrypt.hash(userCredentials.password, salt);
 
-  await user.save();
+  await userCredentials.save();
 
-  const token = user.generateAuthToken();
+  const token = userCredentials.generateAuthToken();
 
   res
     .header("x-auth-token", token)
     .header("access-control-expose-headers", "x-auth-token")
     .send(_.pick(["id", "email"]));
   //store this token in front-end
+});
+
+//Update user info
+router.post("/", auth, async (req, res) => {
+  const userInfo = new User({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    phone: req.body.phone,
+    socials: req.body.socials,
+    cashId: req.body.cashId,
+    address: req.body.address,
+    governorate: req.body.governorate,
+    userCredentials: req.user._id
+  });
+  const result = await userInfo.save();
+
+  res.send(result);
 });
 
 //Update
