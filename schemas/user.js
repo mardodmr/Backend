@@ -21,7 +21,6 @@ const userSchema = new mongoose.Schema({
   address: {type: String, required: true, minlength: 10, maxlength: 1024},
   userType: {type: String, enum: ['regular', 'a', 'b', 'f']},
   governorate: {type: String, required: true, enum: []},
-  birthday: Date,
   password: { type: String, required: true, minlength: 5, maxlength: 1024 },
   numberOfProducts: {type: Number, default: 0, min: 0}
 });
