@@ -40,7 +40,7 @@ router.post("/credentials", async (req, res) => {
   //store this token in front-end
 });
 
-//Update user info
+//Add user info after registration
 router.post("/", auth, async (req, res) => {
   const userInfo = new User({
     firstName: req.body.firstName,
@@ -50,7 +50,7 @@ router.post("/", auth, async (req, res) => {
     cashId: req.body.cashId,
     address: req.body.address,
     governorate: req.body.governorate,
-    userCredentials: req.user._id
+    userCredentials: req.user._id,
   });
   const result = await userInfo.save();
 
@@ -60,10 +60,21 @@ router.post("/", auth, async (req, res) => {
 //Update
 router.put("/:id", auth, async (req, res) => {
   //Lookup the users
-  //If not existing, return 404 (recourse not found)
-
-  //Update the user
-  //Return the updated user
+  const user = await User.findOneAndUpdate(
+    { userCredentials: req.user._id },
+    {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      phone: req.body.phone,
+      socials: req.body.socials,
+      cashId: req.body.cashId,
+      address: req.body.address,
+      governorate: req.body.governorate,
+    }
+  );
+  if (!user)
+    return res.status(404).send("The user with the given ID is not found");
+  
   res.send();
 });
 
