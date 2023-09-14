@@ -12,7 +12,7 @@ const auth = require("../middleware/auth"); //autherization
 
 //View user's info
 router.get("/me", auth, async (req, res) => {
-  const user = await User.findeById(req.user._id).select("-password"); // <-- i may exclude other properties
+  const user = await User.findeOne({userCredentials: req.user._id}).select("firstName lastName phone socials cashId address governorate"); // <-- i may exclude other properties
   res.send(user);
 });
 
@@ -40,7 +40,7 @@ router.post("/credentials", async (req, res) => {
   //store this token in front-end
 });
 
-//Add user info after registration
+//Add(create) user info after registration
 router.post("/", auth, async (req, res) => {
   const userInfo = new User({
     firstName: req.body.firstName,
