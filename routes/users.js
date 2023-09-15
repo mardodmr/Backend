@@ -12,7 +12,9 @@ const auth = require("../middleware/auth"); //autherization
 
 //View user's info
 router.get("/me", auth, async (req, res) => {
-  const user = await User.findeOne({userCredentials: req.user._id}).select("firstName lastName phone socials cashId address governorate"); // <-- i may exclude other properties
+  const user = await User.findeOne({ userCredentials: req.user._id }).select(
+    "_id firstName lastName phone socials cashId address governorate"
+  ); // <-- i may exclude other properties
   res.send(user);
 });
 
@@ -74,7 +76,7 @@ router.put("/:id", auth, async (req, res) => {
   );
   if (!user)
     return res.status(404).send("The user with the given ID is not found");
-  
+
   res.send();
 });
 

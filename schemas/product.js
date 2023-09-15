@@ -38,12 +38,6 @@ const Product = mongoose.model(
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
     }
-    // quantity: {
-    //   type: Number,
-    //   required: function () {
-    //     return this.isAvailable;
-    //   },
-    // }
   })
 );
 
