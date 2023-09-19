@@ -12,7 +12,7 @@ const auth = require("../middleware/auth"); //autherization
 
 //View user's info
 router.get("/me", auth, async (req, res) => {
-  const user = await User.findeOne({ userCredentials: req.user._id }).select(
+  const user = await User.findOne({ userCredentials: req.user._id }).select(
     "_id firstName lastName phone socials cashId address governorate"
   ); // <-- i may exclude other properties
   res.send(user);

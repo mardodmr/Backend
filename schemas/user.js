@@ -51,7 +51,11 @@ const userSchema = new mongoose.Schema({
     minlength: 10,
     maxlength: 1024,
   },
-  userType: { type: String, enum: ["regular", "a", "b", "f"], default: "regular" },
+  userType: {
+    type: String,
+    enum: ["regular", "a", "b", "f"],
+    default: "regular",
+  },
   governorate: { type: String, required: false, enum: [] },
   numberOfProducts: { type: Number, default: 0, min: 0 },
   userCredentials: { type: mongoose.Schema.Types.ObjectId, ref: "credential" },
