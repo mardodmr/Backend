@@ -10,11 +10,17 @@ const auth = require("../middleware/auth"); //autherization
 
 //Users Backend
 
+//User has product?
+router.get("/hasproduct", auth, async (req, res) => {
+  const has = await User.findOne({ _id: req.user }).select("numberOfProducts");
+  res.send(has);
+});
+
 //View user's info
 router.get("/me", auth, async (req, res) => {
-  const user = await User.findOne({ userCredentials: req.user._id }).select(
-    "_id firstName lastName phone socials cashId address governorate"
-  ); // <-- i may exclude other properties
+  const user = await User.findOne({
+    userCredentials: req.credentials._id,
+  }).select("_id firstName lastName phone socials cashId address governorate"); // <-- i may exclude other properties
   res.send(user);
 });
 

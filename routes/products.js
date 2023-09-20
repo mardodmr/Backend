@@ -70,12 +70,12 @@ router.post("/", auth, async (req, res) => {
     isClothes: req.body.isClothes,
     color: req.body.color,
     size: req.body.size,
-    owner: req.user._id,
+    owner: req.user,
   });
   const result = await product.save();
 
   //increment user's number of products by one +1
-  await User.findByIdAndUpdate(req.user._id, {
+  await User.findByIdAndUpdate(req.user, {
     $inc: { numberOfProducts: 1 },
   });
 

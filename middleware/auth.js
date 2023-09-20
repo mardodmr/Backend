@@ -10,9 +10,7 @@ async function auth(req, res, next) {
     const decoded = jwt.verify(token, process.env.jwtPrivateKey);
     req.credentials = decoded;
 
-    const user = await User.findOne({ userCredentials: decoded }).select(
-      "_id firstName lastName phone socials cashId address governorate"
-    ); // <-- i may exclude other properties
+    const user = await User.findOne({ userCredentials: decoded }).select("_id"); // <-- i may exclude other properties
 
     req.user = user;
     next();
