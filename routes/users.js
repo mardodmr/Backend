@@ -14,14 +14,25 @@ const auth = require("../middleware/auth"); //autherization
 router.get("/hasproduct", auth, async (req, res) => {
   const has = await User.findOne({ _id: req.user }).select("numberOfProducts");
   res.send(has);
+  if (!has) return res.status(404).send("User doesn't have any products!");
 });
 
 //View user's info
 router.get("/me", auth, async (req, res) => {
   const user = await User.findOne({
-    userCredentials: req.credentials._id,
-  }).select("_id firstName lastName phone socials cashId address governorate"); // <-- i may exclude other properties
-  res.send(user);
+    userCredentials: req.credentials,
+  }).select({
+    _id: 1,
+    firstName: 1,
+    lastName: 1,
+    phone: 1,
+    socials: 1,
+    cashId: 1,
+    address: 1,
+    governorate: 1,
+  });
+  // console.log("test", req);
+  res.status(200).send(user);
 });
 
 //create user (register)
@@ -37,14 +48,18 @@ router.post("/credentials", async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   userCredentials.password = await bcrypt.hash(userCredentials.password, salt);
 
-  await userCredentials.save();
-
+  console.log("i've hashed the password!");
   const token = userCredentials.generateAuthToken();
-
+  try {
+    if (token) await userCredentials.save();
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("Somthing went wrong!");
+  }
   res
     .header("x-auth-token", token)
     .header("access-control-expose-headers", "x-auth-token")
-    .send(_.pick(["id", "email"]));
+    .send(token);
   //store this token in front-end
 });
 
@@ -58,18 +73,23 @@ router.post("/", auth, async (req, res) => {
     cashId: req.body.cashId,
     address: req.body.address,
     governorate: req.body.governorate,
-    userCredentials: req.user._id,
+    userCredentials: req.credentials,
   });
-  const result = await userInfo.save();
+  try {
+    const result = await userInfo.save();
 
-  res.send(result);
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("something went wrong when saving user info");
+  }
 });
 
 //Update
-router.put("/:id", auth, async (req, res) => {
+router.put("/", auth, async (req, res) => {
   //Lookup the users
   const user = await User.findOneAndUpdate(
-    { userCredentials: req.user._id },
+    { userCredentials: req.credentials },
     {
       firstName: req.body.firstName,
       lastName: req.body.lastName,

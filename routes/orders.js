@@ -12,8 +12,8 @@ router.get("/purchased/:status", auth, async (req, res) => {
     status: req.params.status,
   })
     .sort({ date: -1 })
-    .populate("product", "name _id")
-    .populate("user", "firstName phone cashId")
+    .populate("productId", "name _id")
+    .populate("owner", "firstName phone cashId")
     .select({
       _id: 1,
       name: 1,
@@ -35,8 +35,8 @@ router.get("/process/:status", auth, async (req, res) => {
     status: req.params.status,
   })
     .sort({ date: -1 })
-    .populate("product", "name")
-    .populate("user", "firstName lastName phone cashId")
+    .populate("productId", "name")
+    .populate("buyer", "firstName lastName phone cashId")
     .select({
       _id: 1,
       name: 1,
@@ -66,9 +66,11 @@ router.post("/", auth, async (req, res) => {
   // a product owner can't place an order on their products (not todo)
   // --> if(owner == currentUser) {can't place an order} front-end
 
-  const ownerId = await Product.find({ productId: req.body.productId }).select({
-    owner: 1,
-  });
+  const ownerId = await Product.find({ productId: req.body.productId })
+    .populate("owner", "_id")
+    .select({
+      owner: 1,
+    });
 
   const order = new Order({
     price: req.body.price,

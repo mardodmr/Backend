@@ -20,7 +20,7 @@ router.get("/tags/:tag", async (req, res) => {
       size: 1,
       color: 1,
     });
-  console.log(products);
+  // console.log(products);
   //pagination
   if (!products.length)
     return res.status(404).send("Product with this tag is not existing...");
@@ -30,7 +30,7 @@ router.get("/tags/:tag", async (req, res) => {
 //get all products (pagination)
 router.get("/", async (req, res) => {
   const products = await Product.find()
-    .populate("owner", "firstname lastname") //query a refrenced document
+    .populate("owner", "firstName lastName") //query a refrenced document
     .sort({ date: -1 })
     .select(
       {
@@ -46,7 +46,7 @@ router.get("/", async (req, res) => {
     ); //pagination
   res.send(products);
   if (!products) return res.status(404);
-  console.log(products);
+  // console.log(products);
 });
 
 //Get a product with a given id // this is helpful when a user wants to update a product so they look it up first

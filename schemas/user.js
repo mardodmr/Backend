@@ -6,25 +6,19 @@ require("dotenv").config();
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
-    required: function () {
-      return this.email;
-    },
+    required: true,
     minlength: 3,
     maxlength: 50,
   },
   lastName: {
     type: String,
-    required: function () {
-      return this.email;
-    },
+    required: true,
     minlength: 3,
     maxlength: 50,
   },
   phone: {
     type: String,
-    required: function () {
-      return this.email;
-    },
+    required: true,
     minlength: 10,
     maxlength: 10,
   },
@@ -32,32 +26,25 @@ const userSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now },
   socials: {
     type: Array,
-    required: function () {
-      return this.email;
-    },
+    required: true,
   },
   cashId: {
     type: Number,
-    required: function () {
-      return this.email;
-    },
+    required: true,
     unique: true,
   },
   address: {
     type: String,
-    required: function () {
-      return this.email;
-    },
     minlength: 10,
     maxlength: 1024,
   },
   userType: {
     type: String,
-    enum: ["regular", "a", "b", "f"],
+    enum: ["regular", "single-parent", "war-wounded", "families-of-martyrs"],
     default: "regular",
   },
   governorate: { type: String, required: false, enum: [] },
-  numberOfProducts: { type: Number, default: 0, min: 0 },
+  numberOfProducts: { type: Number, default: 0 },
   userCredentials: { type: mongoose.Schema.Types.ObjectId, ref: "credential" },
 });
 
@@ -74,6 +61,7 @@ const credentailSchema = new mongoose.Schema({
 });
 
 credentailSchema.methods.generateAuthToken = function () {
+  //in the sign method I can add payload based on what i need
   const token = jwt.sign({ _id: this._id }, process.env.jwtPrivateKey);
   return token;
 };
