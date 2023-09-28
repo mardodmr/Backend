@@ -1,16 +1,44 @@
 const { Product } = require("../schemas/product");
-const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth"); //this middleware helps me protect handlers selectively
 const { User } = require("../schemas/user");
 
 //Products Backend
+//Get all products that I own (my products)
+router.get("/myproducts", auth, async (req, res) => {
+  const products = await Product.find()
+    .populate("owner", "_id")
+    .sort({ date: 1 })
+    .select({
+      name: 1,
+      description: 1,
+      tags: 1,
+      date: 1,
+      price: 1,
+      isAvailable: 1,
+      isClothes: 1,
+      size: 1,
+      color: 1,
+      owner: 1,
+    });
+
+  const filtered = products.filter((product) => {
+    return product.owner._id.equals(req.user._id);
+  });
+  res.send(filtered);
+});
 
 //get products based on category (pagination)
 router.get("/tags/:tag", async (req, res) => {
+  const page = req.query.page || 0;
+  const productsPerPage = 10;
+
   const products = await Product.find({ tags: req.params.tag })
+    .populate("owner", "firstName lastName userType")
     .sort({ date: -1 })
+    .skip(page * productsPerPage)
+    .limit(productsPerPage)
     .select({
       name: 1,
       description: 1,
@@ -19,6 +47,7 @@ router.get("/tags/:tag", async (req, res) => {
       isAvailable: 1,
       size: 1,
       color: 1,
+      owner: 1,
     });
   // console.log(products);
   //pagination
@@ -27,11 +56,55 @@ router.get("/tags/:tag", async (req, res) => {
   res.send(products);
 });
 
+//get products based on user type (pagination)
+router.get("/:usertype", async (req, res) => {
+  const page = req.query.page || 0;
+  const productsPerPage = 10;
+
+  const products = await Product.find()
+    .populate("owner", "firstName lastName userType")
+    .sort({ date: -1 })
+    .skip(page * productsPerPage)
+    .limit(productsPerPage)
+    .select({
+      name: 1,
+      description: 1,
+      tag: 1,
+      price: 1,
+      isAvailable: 1,
+      size: 1,
+      color: 1,
+      owner: 1,
+    });
+
+  const filtered = products.filter((product) => {
+    if (product.owner.userType === req.params.usertype) {
+      return true;
+    }
+    return false;
+  });
+
+  res.send(filtered);
+});
+
+//Get a product with a given id // this is helpful when a user wants to update a product so they look it up first
+router.get("/id/:id", async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product)
+    return res.status(404).send("The product with the given ID is not found.");
+  res.send(product);
+});
+
 //get all products (pagination)
 router.get("/", async (req, res) => {
-  const products = await Product.find()
+  const page = req.query.page || 0;
+  const productsPerPage = 10;
+
+  const products = await Product.find({ isAvailable: true })
     .populate("owner", "firstName lastName") //query a refrenced document
     .sort({ date: -1 })
+    .skip(page * productsPerPage)
+    .limit(productsPerPage)
     .select(
       {
         name: 1,
@@ -45,16 +118,8 @@ router.get("/", async (req, res) => {
       } /*return the properties to the user*/
     ); //pagination
   res.send(products);
+  console.log(products);
   if (!products) return res.status(404);
-  // console.log(products);
-});
-
-//Get a product with a given id // this is helpful when a user wants to update a product so they look it up first
-router.get("/id/:id", async (req, res) => {
-  const product = await Product.findById(req.params.id);
-  if (!product)
-    return res.status(404).send("The product with the given ID is not found.");
-  res.send(product);
 });
 
 //Create

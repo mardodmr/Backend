@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
   },
   userType: {
     type: String,
-    enum: ["regular", "single-parent", "war-wounded", "families-of-martyrs"],
+    enum: ["regular", "singleParent", "warWounded", "familiesOfMartyrs"],
     default: "regular",
   },
   governorate: { type: String, required: false, enum: [] },

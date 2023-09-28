@@ -14,7 +14,7 @@ const auth = require("../middleware/auth"); //autherization
 router.get("/hasproduct", auth, async (req, res) => {
   const has = await User.findOne({ _id: req.user }).select("numberOfProducts");
   res.send(has);
-  if (!has) return res.status(404).send("User doesn't have any products!");
+  //if (!has) return res.status(404).send("User doesn't have any products!");
 });
 
 //View user's info
