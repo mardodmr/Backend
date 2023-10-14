@@ -18,28 +18,29 @@ const Product = mongoose.model(
       },
     },
     date: { type: Date, default: Date.now },
-    price: { type: Number, required: true, min: 0 },
+    price: { type: Number, required: true, min: 1 },
     isAvailable: { type: Boolean, required: true, default: true },
     additonalNotes: String,
     size: {
       type: String,
       required: function () {
         return this.isClothes;
-      }
+      },
     },
     color: {
       type: String,
       required: function () {
         return this.isClothes;
-      }
+      },
     },
     isClothes: Boolean,
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
-    }
+    },
+    productImg: { type: String },
   })
 );
 
-module.exports.Product = Product; 
+module.exports.Product = Product;
 //because this is a class

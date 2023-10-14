@@ -21,6 +21,7 @@ router.get("/myproducts", auth, async (req, res) => {
       size: 1,
       color: 1,
       owner: 1,
+      productImg: 1,
     });
 
   const filtered = products.filter((product) => {
@@ -37,8 +38,8 @@ router.get("/tags/:tag", async (req, res) => {
   const products = await Product.find({ tags: req.params.tag })
     .populate("owner", "firstName lastName userType")
     .sort({ date: -1 })
-    .skip(page * productsPerPage)
-    .limit(productsPerPage)
+    // .skip(page * productsPerPage)
+    // .limit(productsPerPage)
     .select({
       name: 1,
       description: 1,
@@ -48,6 +49,7 @@ router.get("/tags/:tag", async (req, res) => {
       size: 1,
       color: 1,
       owner: 1,
+      productImg: 1,
     });
   // console.log(products);
   //pagination
@@ -64,8 +66,8 @@ router.get("/:usertype", async (req, res) => {
   const products = await Product.find()
     .populate("owner", "firstName lastName userType")
     .sort({ date: -1 })
-    .skip(page * productsPerPage)
-    .limit(productsPerPage)
+    // .skip(page * productsPerPage)
+    // .limit(productsPerPage)
     .select({
       name: 1,
       description: 1,
@@ -75,6 +77,7 @@ router.get("/:usertype", async (req, res) => {
       size: 1,
       color: 1,
       owner: 1,
+      productImg: 1,
     });
 
   const filtered = products.filter((product) => {
@@ -103,8 +106,8 @@ router.get("/", async (req, res) => {
   const products = await Product.find({ isAvailable: true })
     .populate("owner", "firstName lastName") //query a refrenced document
     .sort({ date: -1 })
-    .skip(page * productsPerPage)
-    .limit(productsPerPage)
+    // .skip(page * productsPerPage)
+    // .limit(productsPerPage)
     .select(
       {
         name: 1,
@@ -115,10 +118,10 @@ router.get("/", async (req, res) => {
         size: 1,
         color: 1,
         owner: 1,
+        productImg: 1,
       } /*return the properties to the user*/
     ); //pagination
   res.send(products);
-  console.log(products);
   if (!products) return res.status(404);
 });
 
@@ -136,6 +139,7 @@ router.post("/", auth, async (req, res) => {
     color: req.body.color,
     size: req.body.size,
     owner: req.user,
+    productImg: req.body.productImg,
   });
   const result = await product.save();
 

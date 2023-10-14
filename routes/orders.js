@@ -8,16 +8,19 @@ const { Product } = require("../schemas/product");
 //Get the orders of the products I bought.
 router.get("/purchased/:status", auth, async (req, res) => {
   const orders = await Order.find({
-    buyer: req.user,
+    buyer: req.user._id,
     status: req.params.status,
   })
     .sort({ date: -1 })
     .populate("productId", "name _id")
-    .populate("owner", "firstName phone cashId")
+    .populate("owner", "firstName lastName phone cashId")
+    .populate("buyer", "firstName lastName phone cashId")
     .select({
       _id: 1,
-      name: 1,
       price: 1,
+      size: 1,
+      color: 1,
+      buyer: 1,
       date: 1,
       productId: 1,
       quantity: 1,
@@ -25,29 +28,33 @@ router.get("/purchased/:status", auth, async (req, res) => {
       owner: 1,
     });
 
+  if (!orders.length) return res.status(404).send("No orders found!");
   res.send(orders);
 });
 
 //Get people's orders of my products.
 router.get("/process/:status", auth, async (req, res) => {
   const orders = await Order.find({
-    owner: req.user,
+    owner: req.user._id,
     status: req.params.status,
   })
     .sort({ date: -1 })
     .populate("productId", "name")
     .populate("buyer", "firstName lastName phone cashId")
+    .populate("owner", "firstName lastName phone cashId")
     .select({
       _id: 1,
-      name: 1,
       price: 1,
+      size: 1,
+      color: 1,
+      buyer: 1,
       date: 1,
       productId: 1,
       quantity: 1,
       //status: 1,
-      buyer: 1,
-      paid: 1,
+      owner: 1,
     });
+  if (!orders.length) return res.status(404).send("No orders found!");
 
   res.send(orders);
 });
@@ -59,16 +66,17 @@ router.get("/:id", (req, res) => {});
 router.post("/", auth, async (req, res) => {
   // if the product is not Available and no cash id is provided then return
   const available = await Product.find({
-    _id: req.body.productId,
+    _id: req.body._id,
     isAvailavle: true,
   });
   if (!available) return res.status(404).send("This product is out of stock!");
   // a product owner can't place an order on their products (not todo)
   // --> if(owner == currentUser) {can't place an order} front-end
 
-  const ownerId = await Product.find({ productId: req.body.productId })
-    .populate("owner", "_id")
+  const ownerId = await Product.find({ _id: req.body._id })
+    .populate("owner")
     .select({
+      _id: -1,
       owner: 1,
     });
 
@@ -76,8 +84,8 @@ router.post("/", auth, async (req, res) => {
     price: req.body.price,
     size: req.body.size,
     color: req.body.color,
-    productId: req.body.productId,
-    owner: ownerId, //this shouldn't be passed from the frontend
+    productId: req.body._id,
+    owner: ownerId[0].owner._id, //this shouldn't be passed from the frontend
     buyer: req.user,
     quantity: req.body.quantity,
   });

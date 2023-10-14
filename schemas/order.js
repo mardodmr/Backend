@@ -5,7 +5,7 @@ const Order = mongoose.model(
   "order",
   new mongoose.Schema({
     date: { type: Date, default: Date.now },
-    price: { type: Number, required: true, min: 0 }, //total
+    price: { type: Number, min: 0 }, //total
     size: {
       type: String,
     },
@@ -18,13 +18,13 @@ const Order = mongoose.model(
       ref: "user",
     },
     buyer: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
-    quantity: { type: Number, required: true, min: 0, max: 100 },
+    quantity: { type: Number, default: 1, max: 100 },
     status: {
       type: String,
       enum: ["pending", "fulfilled"],
       default: "pending",
     },
-    paid: { type: Boolean, default: false, required: true },
+    paid: { type: Boolean, default: false },
   })
 );
 

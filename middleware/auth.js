@@ -12,10 +12,10 @@ async function auth(req, res, next) {
     req.credentials = decoded._id;
 
     //loading user's email
-    const credentials = await Credential.findOne({
-      _id: decoded._id,
-    }).select("email");
-    req.email = credentials.email;
+    // const credentials = await Credential.findOne({
+    //   _id: decoded._id,
+    // }).select("email");
+    // req.email = credentials.email;
 
     //loading user's id ///problem///
     const user = await User.findOne({ userCredentials: decoded._id }).select(
