@@ -64,14 +64,12 @@ router.get("/:id", (req, res) => {});
 
 //Place (create) an order
 router.post("/", auth, async (req, res) => {
-  // if the product is not Available and no cash id is provided then return
   const available = await Product.find({
     _id: req.body._id,
     isAvailavle: true,
   });
+
   if (!available) return res.status(404).send("This product is out of stock!");
-  // a product owner can't place an order on their products (not todo)
-  // --> if(owner == currentUser) {can't place an order} front-end
 
   const ownerId = await Product.find({ _id: req.body._id })
     .populate("owner")

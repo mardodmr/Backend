@@ -5,6 +5,39 @@ const auth = require("../middleware/auth"); //this middleware helps me protect h
 const { User } = require("../schemas/user");
 
 //Products Backend
+
+//Search products by name
+router.get("/search/:searchWord", async (req, res) => {
+  const page = req.query.page || 0;
+  const productsPerPage = 10;
+
+  const pattern = new RegExp(`.*${req.params.searchWord}.*$`, "i");
+
+  const products = await Product.find({
+    name: { $regex: pattern },
+  })
+    .populate("owner", "firstName lastName userType")
+    .sort({ date: -1 })
+    // .skip(page * productsPerPage)
+    // .limit(productsPerPage)
+    .select({
+      name: 1,
+      description: 1,
+      tags: 1,
+      price: 1,
+      isAvailable: 1,
+      size: 1,
+      color: 1,
+      owner: 1,
+      productImg: 1,
+    });
+  // console.log(products);
+  //pagination
+  if (!products.length)
+    return res.status(404).send("No products found with this name...");
+  res.send(products);
+});
+
 //Get all products that I own (my products)
 router.get("/myproducts", auth, async (req, res) => {
   const products = await Product.find()
@@ -54,7 +87,7 @@ router.get("/tags/:tag", async (req, res) => {
   // console.log(products);
   //pagination
   if (!products.length)
-    return res.status(404).send("Product with this tag is not existing...");
+    return res.status(404).send("No products found with this category...");
   res.send(products);
 });
 
@@ -119,7 +152,7 @@ router.get("/", async (req, res) => {
         color: 1,
         owner: 1,
         productImg: 1,
-      } /*return the properties to the user*/
+      } /*return these properties to the user*/
     ); //pagination
   res.send(products);
   if (!products) return res.status(404);
