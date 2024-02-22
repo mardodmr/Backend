@@ -124,8 +124,19 @@ router.get("/:usertype", async (req, res) => {
 });
 
 //Get a product with a given id // this is helpful when a user wants to update a product so they look it up first
-router.get("/id/:id", async (req, res) => {
-  const product = await Product.findById(req.params.id);
+router.get("/id/:id", auth, async (req, res) => {
+  const product = await Product.findById(req.params.id).select({
+    name: 1,
+    description: 1,
+    tags: 1,
+    price: 1,
+    isAvailable: 1,
+    isClothes: 1,
+    size: 1,
+    color: 1,
+    productImg: 1,
+  });
+
   if (!product)
     return res.status(404).send("The product with the given ID is not found.");
   res.send(product);
@@ -187,16 +198,16 @@ router.post("/", auth, async (req, res) => {
 //Update
 router.put("/:id", auth, async (req, res) => {
   const product = await Product.findByIdAndUpdate(req.params.id, {
-    $set: {
-      name: req.body.name,
-      description: req.body.description,
-      tags: req.body.tags,
-      price: req.body.price,
-      isAvailable: req.body.isAvailable,
-      isClothes: req.body.isClothes,
-      color: req.body.color,
-      size: req.body.size,
-    }, //the update object
+    // $set: {
+    name: req.body.name,
+    description: req.body.description,
+    tags: req.body.tags,
+    price: req.body.price,
+    isAvailable: req.body.isAvailable,
+    isClothes: req.body.isClothes,
+    color: req.body.color,
+    size: req.body.size,
+    // }, //the update object
   });
 
   if (!product)

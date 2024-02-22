@@ -1,9 +1,6 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const router = express.Router();
-const _ = require("lodash");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const { Credential } = require("../schemas/user");
 require("dotenv").config();
 
@@ -18,6 +15,34 @@ router.post("/", async (req, res) => {
   const token = user.generateAuthToken();
 
   res.send(token);
+});
+
+//create user (register)
+router.post("/credentials", async (req, res) => {
+  let userCredentials = await Credential.findOne({ email: req.body.email });
+  if (userCredentials) return res.status(400).send("User already registered.");
+
+  userCredentials = new Credential({
+    email: req.body.email,
+    password: req.body.password,
+  });
+
+  const salt = await bcrypt.genSalt(10);
+  userCredentials.password = await bcrypt.hash(userCredentials.password, salt);
+
+  console.log("i've hashed the password!");
+  const token = userCredentials.generateAuthToken();
+  try {
+    if (token) await userCredentials.save();
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("Somthing went wrong!");
+  }
+  res
+    .header("x-auth-token", token)
+    .header("access-control-expose-headers", "x-auth-token")
+    .send(token);
+  //store this token in front-end
 });
 
 module.exports = router;

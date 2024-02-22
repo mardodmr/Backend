@@ -1,10 +1,6 @@
 const express = require("express");
-const mongoose = require("mongoose");
-const { User, Credential } = require("../schemas/user");
+const { User } = require("../schemas/user");
 const router = express.Router();
-const _ = require("lodash");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const auth = require("../middleware/auth"); //autherization
 
@@ -17,12 +13,11 @@ router.get("/hasproduct", auth, async (req, res) => {
   //if (!has) return res.status(404).send("User doesn't have any products!");
 });
 
-//View user's info
+//Get user's info
 router.get("/me", auth, async (req, res) => {
   const user = await User.findOne({
     userCredentials: req.credentials,
   }).select({
-    _id: 1,
     firstName: 1,
     lastName: 1,
     phone: 1,
@@ -33,34 +28,6 @@ router.get("/me", auth, async (req, res) => {
   });
   // console.log("test", req);
   res.status(200).send(user);
-});
-
-//create user (register)
-router.post("/credentials", async (req, res) => {
-  let userCredentials = await Credential.findOne({ email: req.body.email });
-  if (userCredentials) return res.status(400).send("User already registered.");
-
-  userCredentials = new Credential({
-    email: req.body.email,
-    password: req.body.password,
-  });
-
-  const salt = await bcrypt.genSalt(10);
-  userCredentials.password = await bcrypt.hash(userCredentials.password, salt);
-
-  console.log("i've hashed the password!");
-  const token = userCredentials.generateAuthToken();
-  try {
-    if (token) await userCredentials.save();
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send("Somthing went wrong!");
-  }
-  res
-    .header("x-auth-token", token)
-    .header("access-control-expose-headers", "x-auth-token")
-    .send(token);
-  //store this token in front-end
 });
 
 //Add(create) user info after registration

@@ -21,6 +21,7 @@ const Product = mongoose.model(
     price: { type: Number, required: true, min: 1 },
     isAvailable: { type: Boolean, required: true, default: true },
     additonalNotes: String,
+    isClothes: Boolean,
     size: {
       type: String,
       required: function () {
@@ -33,7 +34,6 @@ const Product = mongoose.model(
         return this.isClothes;
       },
     },
-    isClothes: Boolean,
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",

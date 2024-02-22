@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
 
   date: { type: Date, default: Date.now },
   socials: {
-    type: Array,
+    type: String,
     required: true,
   },
   cashId: {
