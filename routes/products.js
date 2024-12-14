@@ -42,7 +42,7 @@ router.get("/search/:searchWord", async (req, res) => {
 router.get("/myproducts", auth, async (req, res) => {
   const products = await Product.find()
     .populate("owner", "_id")
-    .sort({ date: 1 })
+    .sort({ date: -1 })
     .select({
       name: 1,
       description: 1,

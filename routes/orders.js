@@ -24,8 +24,9 @@ router.get("/purchased/:status", auth, async (req, res) => {
       date: 1,
       productId: 1,
       quantity: 1,
-      //status: 1,
+      status: 1,
       owner: 1,
+      paid: 1,
     });
 
   if (!orders.length) return res.status(404).send("No orders found!");
@@ -51,8 +52,9 @@ router.get("/process/:status", auth, async (req, res) => {
       date: 1,
       productId: 1,
       quantity: 1,
-      //status: 1,
+      status: 1,
       owner: 1,
+      paid: 1,
     });
   if (!orders.length) return res.status(404).send("No orders found!");
 
@@ -94,9 +96,7 @@ router.post("/", auth, async (req, res) => {
 // Update an order --> paid: true
 router.put("/paid/:id", auth, async (req, res) => {
   const order = await Order.findByIdAndUpdate(req.params.id, {
-    $set: {
-      paid: true,
-    },
+    paid: true,
   });
   res.send(order);
 });
@@ -104,9 +104,7 @@ router.put("/paid/:id", auth, async (req, res) => {
 //Update an order --> status: fulfilled / pending
 router.put("/status/:id", auth, async (req, res) => {
   const order = await Order.findByIdAndUpdate(req.params.id, {
-    $set: {
-      status: "fulfilled",
-    },
+    status: "fulfilled",
   });
   res.send(order);
 });
